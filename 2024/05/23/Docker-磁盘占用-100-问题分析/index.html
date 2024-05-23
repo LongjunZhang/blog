@@ -35,7 +35,7 @@
 <meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/image-(5).2vekp2exw8.webp">
 <meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/image-(6).6t6y5qpyjc.webp">
 <meta property="article:published_time" content="2024-05-23T13:24:21.000Z">
-<meta property="article:modified_time" content="2024-05-23T13:31:42.214Z">
+<meta property="article:modified_time" content="2024-05-23T13:51:16.135Z">
 <meta property="article:author" content="Frank">
 <meta property="article:tag" content="Docker">
 <meta property="article:tag" content="Overlay2">
@@ -191,7 +191,7 @@
       <span class="post-meta-item-text">发表于</span>
       
 
-      <time title="创建时间：2024-05-23 21:24:21 / 修改时间：21:31:42" itemprop="dateCreated datePublished" datetime="2024-05-23T21:24:21+08:00">2024-05-23</time>
+      <time title="创建时间：2024-05-23 21:24:21 / 修改时间：21:51:16" itemprop="dateCreated datePublished" datetime="2024-05-23T21:24:21+08:00">2024-05-23</time>
     </span>
 
   
@@ -205,7 +205,10 @@
     
     <div class="post-body" itemprop="articleBody"><h1 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h1><p>公司内部 Docker 镜像构建服务器, 使用一段时间后, 经常会出现磁盘占用很大的问题, 曾经一度导致磁盘 100% 的告警问题. <br />通过 Linux 系统命令<code>df -h</code>查看原因发现, 是<code>/var/lib/docker/overlay2</code>目录下的文件占用太多空间<br /><img src="https://longjunzhang.github.io/picx-images-hosting/image.5mnmx511y1.webp" alt="image.png"></p>
 <h1 id="问题分析"><a href="#问题分析" class="headerlink" title="问题分析"></a>问题分析</h1><h2 id="Docker-文件系统"><a href="#Docker-文件系统" class="headerlink" title="Docker 文件系统"></a>Docker 文件系统</h2><p><code>/var/lib/docker/overlay2</code>是 Docker 的文件系统目录, 里面包含了 Docker 系统的各种文件内容, 镜像, 容器, 日志, 缓存等等. <strong><em>如果强行将 overlay2 目录删除, 将导致 Docker 软件的完整性遭到破坏, 无法启动 Docker.</em></strong><br />事实上, Docker CLI 提供了管理 Docker 的命令<code>docker system --help</code><br /><img src="https://longjunzhang.github.io/picx-images-hosting/image-(1).231p7byc5x.webp" alt="image.png"><br />通过<code>docker system df</code>命令, 可以查看 Docker 的磁盘使用情况<br /><img src="https://longjunzhang.github.io/picx-images-hosting/image-(2).361ei7u61h.webp"><br />通过命令输出结果可知, 磁盘占用比最高的是<code>Build Cache</code></p>
-<h2 id="Why"><a href="#Why" class="headerlink" title="Why?"></a>Why?</h2><p>Docker 在<code>Build, Push, Pull</code>的时候, 由于 Docker OverlayFS 镜像文件系统分层设计的原因, 每次都会构建缓存, 以便将来可以重复使用该缓存, 从而提高<code>Build, Push, Pull</code>的速度.<br />当 Docker 服务中经常构建不同镜像时, 每次计算得出的分层镜像文件的 HashCode 值不一样, 就会导致服务中出现大量的缓存文件. <br />对于缓存层文件, 之所以缓存是因为希望下次可以 Cache 命中, 如果一个镜像缓存层每次 Cache 命中率基本为 0; 那就意味着该缓存层实际利用率很低, 不值得去浪费磁盘空间去缓存.</p>
+<h2 id="Why"><a href="#Why" class="headerlink" title="Why?"></a>Why?</h2><p>由于 Docker OverlayFS 镜像文件系统分层设计的原因, 每个中间层镜像文件都会被缓存，以便将来可以重复使用该缓存, 从而提高Build, Push, Pull的速度（每次只需要Build, Push, Pull不同的镜像层即可，也就是所谓的增量更新）.</p>
+<p>缓存的设计，本质上就是空间换时间的思想体现，时间效率上提高了，代价便是空间上会有大量的浪费。</p>
+<p>尤其是，当某些 Docker 中间层镜像，只会被一个镜像构建所使用时，不存在被其他构建使用时，那么该中间镜像缓存层就不是一种理想的中间缓存层（理想的中间缓存层应该是尽可能被复用很多次），从而造成了空间上的浪费。</p>
+<p>事实上，很多公司，由于项目结构不合理的原因，导致每次变更业务代码都会导致构建的镜像缓存层完全不一致（参见上一篇文章所描述），频繁地构建应用服务，导致出现了大量一次性的镜像缓存层文件（HashCode 不一样），最终导致Build Cache文件急剧膨胀，直至宿主机磁盘 100% 告警。</p>
 <h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>在 <a target="_blank" rel="noopener" href="https://docs.docker.com/reference/">Docker 官方文档</a> 查询清除缓存数据的方法<br /><img src="https://longjunzhang.github.io/picx-images-hosting/45a32f8c2abb1b04fdd5e504e7d73be.45igzstuc.webp"><br /><img src="https://longjunzhang.github.io/picx-images-hosting/image-(3).4n7jjyyas7.webp" alt="询问 AI"><br /><br>根据提示, 使用命令 <code>docker builder prune</code><br><br /><img src="https://longjunzhang.github.io/picx-images-hosting/image-(4).7i07prdhjr.webp" alt="运行结果"><br /><img src="https://longjunzhang.github.io/picx-images-hosting/image-(5).2vekp2exw8.webp" alt="查看磁盘使用情况"></p>
 <h1 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h1><h2 id="悬虚镜像"><a href="#悬虚镜像" class="headerlink" title="悬虚镜像"></a>悬虚镜像</h2><p>Docker 服务日常运行中, 还会经常出现一种 <strong>悬虚镜像(danging image)</strong> 的文件浪费大量磁盘空间. <br />其表现形式为, 通过<code>docker image ls -f dangling=true</code>命令查看到一些 REPOSITORY 和 TAG 为 <code>&lt;none&gt;</code>的镜像</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">REPOSITORY         TAG             IMAGE ID       CREATED        SIZE</span><br><span class="line">&lt;none&gt;             &lt;none&gt;          62a8767b2521   2 hours ago    505MB</span><br></pre></td></tr></table></figure>
