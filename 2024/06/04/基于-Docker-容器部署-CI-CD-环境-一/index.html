@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.2.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"longjunzhang.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/blog/js/config.js"></script>
+
+    <meta name="description" content="本文基于 Docker 容器化部署了 CI&#x2F;CD 环境的必备组件">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于 Docker 容器部署 CI&#x2F;CD 环境(一)">
+<meta property="og:url" content="https://longjunzhang.github.io/blog/2024/06/04/%E5%9F%BA%E4%BA%8E-Docker-%E5%AE%B9%E5%99%A8%E9%83%A8%E7%BD%B2-CI-CD-%E7%8E%AF%E5%A2%83-%E4%B8%80/index.html">
+<meta property="og:site_name" content="龙军的技术博客">
+<meta property="og:description" content="本文基于 Docker 容器化部署了 CI&#x2F;CD 环境的必备组件">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image.39l0vufnkc.webp">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(1).5mnnd1tgqo.webp">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(2).1020ccux35.webp">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(3).1020ccux35.webp">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(4).4ckq6qbhfm.webp">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(5).1aou5ia58j.webp">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(6).1ov9wdig3n.webp">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(7).sysgx8rno.webp">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(8).8dwpl4fksl.webp">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(9).8kzxgk1q86.webp">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(10).39l0vufnk6.webp">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(11).3d4mtk8q9z.webp">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(12).9gwew0beo9.webp">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(13).4xudt15xqi.webp">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(14).32ht0eti4q.webp">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(15).5c0tjwe8ln.webp">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(16).7lju3dyz2j.webp">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image.13lma31oic.webp">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(17).92pz55pfvb.webp">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(1).361ey509jf.webp">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(2).7lju3ecnrf.webp">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(3).231pn94fnw.webp">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(4).4n7jzw4ea4.webp">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(5).7i085ojl1p.webp">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(6).3k7up08kel.webp">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(7).39l0vutc99.webp">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(8).86thpp7426.webp">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(9).8ad3nf06rz.webp">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(10).7p3g145qhb.webp">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(11).99t70l2xxs.webp">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(12).8z6d7fnpsg.webp">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(13).7ax0a8xfm9.webp">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(14).86thpp7429.webp">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(15).wieenfj2q.webp">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(16).7p3g145qhf.webp">
+<meta property="article:published_time" content="2024-06-03T16:26:15.000Z">
+<meta property="article:modified_time" content="2024-06-03T16:50:55.358Z">
+<meta property="article:author" content="Frank">
+<meta property="article:tag" content="Docker">
+<meta property="article:tag" content="CI&#x2F;CD">
+<meta property="article:tag" content="Jenkins">
+<meta property="article:tag" content="SpringBoot">
+<meta property="article:tag" content="Pipeline">
+<meta property="article:tag" content="Harbor">
+<meta property="article:tag" content="1Panel">
+<meta property="article:tag" content="Nexus">
+<meta property="article:tag" content="GitLab">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://longjunzhang.github.io/picx-images-hosting/20240604/image.39l0vufnkc.webp">
+
+
+<link rel="canonical" href="https://longjunzhang.github.io/blog/2024/06/04/%E5%9F%BA%E4%BA%8E-Docker-%E5%AE%B9%E5%99%A8%E9%83%A8%E7%BD%B2-CI-CD-%E7%8E%AF%E5%A2%83-%E4%B8%80/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://longjunzhang.github.io/blog/2024/06/04/%E5%9F%BA%E4%BA%8E-Docker-%E5%AE%B9%E5%99%A8%E9%83%A8%E7%BD%B2-CI-CD-%E7%8E%AF%E5%A2%83-%E4%B8%80/","path":"2024/06/04/基于-Docker-容器部署-CI-CD-环境-一/","title":"基于 Docker 容器部署 CI/CD 环境(一)"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>基于 Docker 容器部署 CI/CD 环境(一) | 龙军的技术博客</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">龙军的技术博客</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF%E6%8F%8F%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">背景描述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E7%9B%AE%E6%A0%87"><span class="nav-number">2.</span> <span class="nav-text">实现目标</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%90%AD%E5%BB%BA%E6%AD%A5%E9%AA%A4"><span class="nav-number">3.</span> <span class="nav-text">搭建步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker"><span class="nav-number">3.1.</span> <span class="nav-text">Docker</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1Panel"><span class="nav-number">3.2.</span> <span class="nav-text">1Panel</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Nexus"><span class="nav-number">3.3.</span> <span class="nav-text">Nexus</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GitLab"><span class="nav-number">3.4.</span> <span class="nav-text">GitLab</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Jenkins"><span class="nav-number">3.5.</span> <span class="nav-text">Jenkins</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Harbor"><span class="nav-number">3.6.</span> <span class="nav-text">Harbor</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B7%A5%E4%BD%9C%E6%B5%81%E9%85%8D%E7%BD%AE"><span class="nav-number">4.</span> <span class="nav-text">工作流配置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8B%89%E5%8F%96%E9%A1%B9%E7%9B%AE"><span class="nav-number">4.1.</span> <span class="nav-text">拉取项目</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE-Nexus-%E7%A7%81%E6%9C%8D"><span class="nav-number">4.2.</span> <span class="nav-text">配置 Nexus 私服</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0%E7%BC%96%E8%AF%91%E9%A1%B9%E7%9B%AE"><span class="nav-number">4.3.</span> <span class="nav-text">本地编译项目</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE-Jenkins-Pipeline"><span class="nav-number">4.4.</span> <span class="nav-text">配置 Jenkins Pipeline</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE-Jenkins-%E7%BC%96%E8%AF%91%E7%8E%AF%E5%A2%83"><span class="nav-number">4.4.1.</span> <span class="nav-text">配置 Jenkins 编译环境</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE-Maven-%E7%8E%AF%E5%A2%83"><span class="nav-number">4.4.1.1.</span> <span class="nav-text">配置 Maven 环境</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE-JDK-%E7%8E%AF%E5%A2%83"><span class="nav-number">4.4.1.2.</span> <span class="nav-text">配置 JDK 环境</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Jenkins-%E4%B8%AD%E9%85%8D%E7%BD%AE%E7%BC%96%E8%AF%91%E5%9F%BA%E7%A1%80%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F"><span class="nav-number">4.4.1.3.</span> <span class="nav-text">Jenkins 中配置编译基础环境变量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE-Docker-%E7%99%BB%E5%BD%95-Harbor"><span class="nav-number">4.4.1.4.</span> <span class="nav-text">配置 Docker 登录 Harbor</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA-Pipeline"><span class="nav-number">4.4.1.5.</span> <span class="nav-text">创建 Pipeline</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E6%B5%81%E6%B0%B4%E7%BA%BF"><span class="nav-number">4.4.1.6.</span> <span class="nav-text">测试流水线</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8B%89%E5%8F%96%E9%95%9C%E5%83%8F%EF%BC%8C%E8%BF%90%E8%A1%8C%E5%AE%B9%E5%99%A8"><span class="nav-number">4.4.1.7.</span> <span class="nav-text">拉取镜像，运行容器</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Frank</p>
+  <div class="site-description" itemprop="description">人是一棵会思考芦苇</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://longjunzhang.github.io/blog/2024/06/04/%E5%9F%BA%E4%BA%8E-Docker-%E5%AE%B9%E5%99%A8%E9%83%A8%E7%BD%B2-CI-CD-%E7%8E%AF%E5%A2%83-%E4%B8%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="Frank">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="龙军的技术博客">
+      <meta itemprop="description" content="人是一棵会思考芦苇">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="基于 Docker 容器部署 CI/CD 环境(一) | 龙军的技术博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          基于 Docker 容器部署 CI/CD 环境(一)
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2024-06-04 00:26:15 / 修改时间：00:50:55" itemprop="dateCreated datePublished" datetime="2024-06-04T00:26:15+08:00">2024-06-04</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="背景描述"><a href="#背景描述" class="headerlink" title="背景描述"></a>背景描述</h1><p>对于许多小型创业公司而言，并不会专门有运维人员去维护一套完整的 CI&#x2F;CD 组件，但 CI&#x2F;CD 组件又是必不可少的，否则会很影响软件开发效率。<br>小型创业公司为了使用一套 CI&#x2F;CD 组件，一般会有 2 种解决方案</p>
+<ol>
+<li>购买成熟的 CI&#x2F;CD 平台，例如：阿里云的飞天智能运维平台<ol>
+<li><strong>优点</strong>：省事，所有流程托管给云平台</li>
+<li><strong>缺点</strong>：费钱，对数据安全性要求高的公司，不可接受软件源码构建部署在公有云上</li>
+</ol>
+</li>
+<li>由资深后端开发人员或架构师，自建一套适合小型团队的 CI&#x2F;CD 组件<ol>
+<li><strong>优点</strong>：省钱（省去单独招一个运维人员的钱），可灵活配置</li>
+<li><strong>缺点</strong>：对技术人员要求较高</li>
+</ol>
+</li>
+</ol>
+<p>出于成本考虑，大部分公司往往会选择购买几台 Linux 云服务器，来自建一套适合自己团队的 CI&#x2F;CD 组件。（_事实上，我曾经待过的开发工程师人数高达上千人，应用服务有几百个的公司，也会选择自建；原因无他——省钱，云服务器成本其实并不低_）</p>
+<h1 id="实现目标"><a href="#实现目标" class="headerlink" title="实现目标"></a>实现目标</h1><p>因此，本文旨在，提供一套适合小型团队开发的 CI&#x2F;CD 组件，基于 Docker 容器化，实现快速部署，低成本运维管理。<br>以常见的 Java Web 开发流程为例，实现以下功能</p>
+<ol>
+<li>Nexus：实现公司私有、公共依赖包的统一管理</li>
+<li>GitLab：实现统一管理公司代码项目</li>
+<li>Jenkins：实现项目的自动化流水线构建，从编译，到最终部署</li>
+<li>Docker：实现应用服务的容器化部署</li>
+<li>Harbor：统一管理 Docker 镜像</li>
+<li>1Panel：提供 Linux 服务器图形化面板操作界面</li>
+</ol>
+<h1 id="搭建步骤"><a href="#搭建步骤" class="headerlink" title="搭建步骤"></a>搭建步骤</h1><p>以 Centos 8 为例，先切换到<code>root</code>用户模式<br><img src="https://longjunzhang.github.io/picx-images-hosting/20240604/image.39l0vufnkc.webp" alt="image.png"></p>
+<h2 id="Docker"><a href="#Docker" class="headerlink" title="Docker"></a>Docker</h2><blockquote>
+<p>优于 Nexus, GitLab, Jenkins, Harbor 都是容器化运行，所以需要先安装 Docker</p>
+</blockquote>
+<p>根据官方安装文档 <a target="_blank" rel="noopener" href="https://docs.docker.com/engine/install/centos/#os-requirements">Docker Install On CentOS</a>，安装完 Docker 后输入命令检查 Docker 是否启动成功<br><img src="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(1).5mnnd1tgqo.webp" alt="image.png"><br>配置 Docker 的镜像下载地址，在<code>/etc/docker/daemon.json</code>文件中（_如果该文件不存在，创建该文件_）</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;registry-mirrors&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="string">&quot;https://registry.docker-cn.com&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="string">&quot;http://hub-mirror.c.163.com&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="string">&quot;https://docker.mirrors.ustc.edu.cn&quot;</span></span><br><span class="line">  <span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>然后，重启 Docker 服务<code>service docker restart</code>，查看 Docker 信息<code>docker info</code>，可以看到 Registry Mirrors 信息已生效<br><img src="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(2).1020ccux35.webp" alt="image.png"><br>最后，将 Docker 服务设置为开机自动启动<code>sudo systemctl enable docker</code></p>
+<h2 id="1Panel"><a href="#1Panel" class="headerlink" title="1Panel"></a>1Panel</h2><blockquote>
+<p>1Panel 是开源的 Linux 服务器运维管理面板，安装之后可以更方便对 Linux 服务器做管理，图形化界面也可以帮助将来降低运维操作难度。</p>
+</blockquote>
+<p>根据官方文档 <a target="_blank" rel="noopener" href="https://1panel.cn/docs/installation/online_installation/">1Panel Install On CentOS</a> 结果如下<br><img src="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(3).1020ccux35.webp"><br>访问内网地址 <a target="_blank" rel="noopener" href="http://198.19.249.15:39993/683cbc25fb">http://198.19.249.15:39993/683cbc25fb</a>，输入用户名和密码，即可得到一个图形化的 Linux 运维面板<br><img src="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(4).4ckq6qbhfm.webp" alt="image.png"><br>1Panel 强大的之处在于提供了应用商店功能，这里面提供了大量常见的运维软件的 Docker 镜像，可以一键部署，非常方便！<br><img src="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(5).1aou5ia58j.webp" alt="image.png"></p>
+<h2 id="Nexus"><a href="#Nexus" class="headerlink" title="Nexus"></a>Nexus</h2><p>在 1Panel 商店中搜索 Nexus 软件，进入安装页面，勾选端口外部访问，即可进入安装<br><img src="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(6).1ov9wdig3n.webp" alt="image.png"><br>等待 Docker 安装完毕之后，即可在页面中看到 Nexus 容器信息<br><img src="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(7).sysgx8rno.webp" alt="image.png"><br>点击访问 Nexus 地址 <a target="_blank" rel="noopener" href="http://198.19.249.15:8081/">http://198.19.249.15:8081/</a><br><img src="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(8).8dwpl4fksl.webp" alt="image.png"><br>根据提示，1Panel 页面中，选择 Nexus 容器右边的<strong>终端</strong>按钮，连接容器内部，输入命令<code>cat /nexus-data/admin.password</code>查看 Nexu 初始密码<br><img src="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(9).8kzxgk1q86.webp" alt="image.png"></p>
+<h2 id="GitLab"><a href="#GitLab" class="headerlink" title="GitLab"></a>GitLab</h2><blockquote>
+<p>1Panel 商店中并没有提供 GitLab 镜像，但是提供了 Gitea 镜像安装。<br>事实上，Gitea 已经足够满足大部分中小型公司的代码仓库，但考虑到大部分公司习惯使用 GitLab 这里便需要我们手动编排镜像，创建一个 GitLab 容器。</p>
+</blockquote>
+<p>在 1Panel 页面手动创建 GitLab 的编排，下面给出具体配置，以及关键参数的说明</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">&#x27;3.6&#x27;</span></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="attr">gitlab:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">gitlab/gitlab-ee:12.0.8-ee.0</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">gitlab</span></span><br><span class="line">    <span class="attr">platform:</span> <span class="string">linux/amd64</span></span><br><span class="line">    <span class="attr">privileged:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">restart:</span> <span class="string">always</span></span><br><span class="line">    <span class="comment"># GitLab 主机地址</span></span><br><span class="line">    <span class="attr">hostname:</span> <span class="string">&#x27;198.19.249.15&#x27;</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="attr">GITLAB_OMNIBUS_CONFIG:</span> <span class="string">|</span></span><br><span class="line"><span class="string">        external_url &#x27;http://198.19.249.15&#x27;</span></span><br><span class="line"><span class="string"></span>    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&#x27;80:80&#x27;</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&#x27;443:443&#x27;</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&#x27;422:22&#x27;</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">/opt/1panel/apps/gitlab/config:/etc/gitlab</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">/opt/1panel/apps/gitlab/logs:/var/log/gitlab</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">/opt/1panel/apps/gitlab/data:/var/opt/gitlab</span></span><br><span class="line">    <span class="attr">shm_size:</span> <span class="string">&#x27;256m&#x27;</span></span><br><span class="line">    <span class="comment"># 与 Nexus 放在同一网段下</span></span><br><span class="line">    <span class="attr">networks:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">1panel-network</span></span><br><span class="line"></span><br><span class="line"><span class="attr">networks:</span></span><br><span class="line">  <span class="attr">1panel-network:</span></span><br><span class="line">    <span class="attr">external:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+<p>由于这是手动编排的容器，所以需要提前手动创建好<code>/opt/1panel/apps/gitlab/config, /opt/1panel/apps/gitlab/logs, /opt/1panel/apps/gitlab/data</code>目录，否则 docker-compose 创建报错<br><img src="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(10).39l0vufnk6.webp" alt="image.png"><br>等待片刻，即可在 1Panel 界面看到 GitLab 容器启动成功的标志，现在便可以访问 GitLab 地址 <a target="_blank" rel="noopener" href="http://198.19.249.15/">http://198.19.249.15:80</a><br><img src="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(11).3d4mtk8q9z.webp" alt="image.png"></p>
+<h2 id="Jenkins"><a href="#Jenkins" class="headerlink" title="Jenkins"></a>Jenkins</h2><p>与 Nexus 同理，在 1Panel 应用商店搜索 Jenkins 安装即可(记得开启允许外部访问）<br><img src="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(12).9gwew0beo9.webp" alt="image.png"><br>点击访问 <a target="_blank" rel="noopener" href="http://198.19.249.15:8080/">http://198.19.249.15:8080/</a>，输入日志中查看到的 Jenkins 初始密码，即可开始 Jenkins 的初始化安装<br><img src="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(13).4xudt15xqi.webp" alt="image.png"></p>
+<h2 id="Harbor"><a href="#Harbor" class="headerlink" title="Harbor"></a>Harbor</h2><blockquote>
+<p>1Panel 应用商店并没有提供 Harbor 的镜像安装，同样需要我们手动安装。</p>
+</blockquote>
+<p>根据 Harbor 官方文档，到 Harbor 项目的 <a target="_blank" rel="noopener" href="https://github.com/goharbor/harbor/releases">releases 页面</a> 下载 Harbor 安装配置信息<br><img src="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(14).32ht0eti4q.webp" alt="image.png"><br>建议下载 harbor-online-installer-v2.9.4.tgz 文件，这里面仅仅只是 Harbor 容器的以来描述文件和配置文件。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">如果没有 wegt 软件，需要先安装</span></span><br><span class="line">yum install -y wget</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">下载 Harbor 安装文件</span></span><br><span class="line">wget https://github.com/goharbor/harbor/releases/download/v2.9.2/harbor-online-installer-v2.9.2.tgz</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">解压文件</span></span><br><span class="line">tar -zxvf harbor-online-installer-v2.9.4.tgz</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">修改 yml 文件名</span></span><br><span class="line">cd harbor</span><br><span class="line">mv harbor.yml.tmpl harbor.yml</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">修改 yml 配置信息(具体修改配置内容，参见下图)</span></span><br><span class="line">vi harbor.yml</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">运行安装程序</span></span><br><span class="line">./install.sh</span><br></pre></td></tr></table></figure>
+<p><img src="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(15).5c0tjwe8ln.webp" alt="image.png"><br>经过漫长的安装过程，最终通过 Harbor 默认用户名<code>admin</code>和密码<code>Harbor12345</code>登录 Harbor 界面<br><img src="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(16).7lju3dyz2j.webp" alt="image.png"><br>至此，我们已经完成了 CI&#x2F;CD 工作流所需要的必备软件，接下来以部署一个 SpringBoot 后端项目为例，详细讲解其中各组件所需要配置的环境。</p>
+<h1 id="工作流配置"><a href="#工作流配置" class="headerlink" title="工作流配置"></a>工作流配置</h1><h2 id="拉取项目"><a href="#拉取项目" class="headerlink" title="拉取项目"></a>拉取项目</h2><p>这里我们在 GitLab 克隆一个开源项目（<a target="_blank" rel="noopener" href="https://gitee.com/y_project/RuoYi">Ruoyi</a>），在 IDEA 中创建新项目从我们的 GitLab 仓库中拉取<br><img src="https://longjunzhang.github.io/picx-images-hosting/20240604/image.13lma31oic.webp" alt="image.png"></p>
+<h2 id="配置-Nexus-私服"><a href="#配置-Nexus-私服" class="headerlink" title="配置 Nexus 私服"></a>配置 Nexus 私服</h2><p>设置 Maven settings.xml 文件，根据 <a target="_blank" rel="noopener" href="https://developer.aliyun.com/article/1328445">Nexus 私服配置教程</a> 完成配置</p>
+<h2 id="本地编译项目"><a href="#本地编译项目" class="headerlink" title="本地编译项目"></a>本地编译项目</h2><p>为项目创建 Dockerfile 文件（注意：由于本项目需要用到图形化验证码组件，OpenJDK 没有提供，所以需要使用完整的 Oracle JDK）</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> domblack/oracle-jdk8:latest AS builder</span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> ./target/ruoyi-admin.jar app.jar</span></span><br><span class="line"><span class="keyword">EXPOSE</span> <span class="number">6060</span></span><br><span class="line"><span class="comment"># FatJar 分层解压</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> java -Djarmode=layertools -jar app.jar extract</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">FROM</span> domblack/oracle-jdk8:latest</span><br><span class="line"><span class="comment"># FatJar 分层构建镜像</span></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> --from=builder dependencies/ ./</span></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> --from=builder spring-boot-loader/ ./</span></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> --from=builder snapshot-dependencies/ ./</span></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> --from=builder application/ ./</span></span><br><span class="line"><span class="keyword">ENTRYPOINT</span><span class="language-bash"> [<span class="string">&quot;java&quot;</span>, <span class="string">&quot;org.springframework.boot.loader.JarLauncher&quot;</span>]</span></span><br></pre></td></tr></table></figure>
+<p>本地构建 Docker 镜像<br><img src="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(17).92pz55pfvb.webp" alt="image.png"><br>运行 Docker 容器<code>docker run --name ruoyi -p 6060:6060 ruoyi:latest</code><br><img src="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(1).361ey509jf.webp" alt="image.png"><br>运行成功，访问本地地址 <a target="_blank" rel="noopener" href="http://localhost:6060/login">http://localhost:6060</a><br><img src="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(2).7lju3ecnrf.webp" alt="image.png"></p>
+<h2 id="配置-Jenkins-Pipeline"><a href="#配置-Jenkins-Pipeline" class="headerlink" title="配置 Jenkins Pipeline"></a>配置 Jenkins Pipeline</h2><p>将代码提交到 GitLab 之后，便可以开始在 Jenkins 中创建对应的 Pipeline</p>
+<h3 id="配置-Jenkins-编译环境"><a href="#配置-Jenkins-编译环境" class="headerlink" title="配置 Jenkins 编译环境"></a>配置 Jenkins 编译环境</h3><h4 id="配置-Maven-环境"><a href="#配置-Maven-环境" class="headerlink" title="配置 Maven 环境"></a>配置 Maven 环境</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">下载 Maven</span> </span><br><span class="line">wget https://mirrors.aliyun.com/apache/maven/maven-3/3.9.4/binaries/apache-maven-3.9.4-bin.tar.gz</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">解压文件</span></span><br><span class="line">tar -zxvf apache-maven-3.9.4-bin.tar.gz</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">替换 settings.xml 文件就是上面 Nexus 配置私服的文件</span></span><br><span class="line">cp settings.xml ./apache-maven-3.9.4/conf/</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">拷贝 Maven 文件到 Jenkins 容器内部</span></span><br><span class="line">docker cp apache-maven-3.9.4/ Jenkins:/var/</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">mvn 可执行文件路径</span></span><br><span class="line">./var/apache-maven-3.9.4/bin/mvn -v</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">settings.xml文件路径</span></span><br><span class="line">/var/apache-maven-3.9.4/conf/settings.xml</span><br></pre></td></tr></table></figure>
+<h4 id="配置-JDK-环境"><a href="#配置-JDK-环境" class="headerlink" title="配置 JDK 环境"></a>配置 JDK 环境</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">下载 JDK1.8</span></span><br><span class="line">wget https://d6.injdk.cn/oraclejdk/8/jdk-8u381-linux-x64.tar.gz</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">解压文件</span></span><br><span class="line">tar -zxvf jdk-8u381-linux-x64.tar.gz</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">拷贝到 Jenkins 容器内部</span></span><br><span class="line">docker cp jdk1.8.0_381/ Jenkins:/var/</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">java 可执行文件路径</span></span><br><span class="line">./var/jdk1.8.0_381/bin/java -version</span><br></pre></td></tr></table></figure>
+<h4 id="Jenkins-中配置编译基础环境变量"><a href="#Jenkins-中配置编译基础环境变量" class="headerlink" title="Jenkins 中配置编译基础环境变量"></a>Jenkins 中配置编译基础环境变量</h4><p><img src="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(3).231pn94fnw.webp" alt="image.png"><br><img src="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(4).4n7jzw4ea4.webp" alt="image.png"><br><img src="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(5).7i085ojl1p.webp" alt="image.png"></p>
+<h4 id="配置-Docker-登录-Harbor"><a href="#配置-Docker-登录-Harbor" class="headerlink" title="配置 Docker 登录 Harbor"></a>配置 Docker 登录 Harbor</h4><p>Jenkins 会将我们的服务打包成一个 Docker 镜像，然后会把 Docker 镜像推送到 Harbor 平台上，方便 DEV, TEST, PROD 等环境去拉取镜像，因此需要配置 Docker 登录 Harbor 镜像。<br>由于我们上面配置 Harbor 的时候，关闭了 HTTPS 的模式，所以直接登录 Harbor 会出现下面这个错误<br><img src="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(6).3k7up08kel.webp" alt="image.png"><br>根据 <a target="_blank" rel="noopener" href="https://www.cnblogs.com/lucktomato/p/16704751.html">Linux登录连接Harbor报错</a> 中给的解决方法，重新登录 Harbor</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker login 192.168.3.67:1010 -uadmin -pHarbor12345</span><br></pre></td></tr></table></figure>
+<p>此时出现新的报错问题<br><img src="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(7).39l0vutc99.webp" alt="image.png"><br>根据报错提示<code>dial tcp: lookup my.harbor.com on 198.19.248.200:53: no such host</code>，说明在请求我们自定义的域名<code>my.harbor.com</code>请求失败<br>解决方法是，在 Linux 系统中修改<code>/etc/hosts</code>文件，添加域名映射</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">192.168.3.67    my.harbor.com</span><br></pre></td></tr></table></figure>
+<p>此时重新登录 Harbor，登录成功<br><img src="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(8).86thpp7426.webp" alt="image.png"></p>
+<h4 id="创建-Pipeline"><a href="#创建-Pipeline" class="headerlink" title="创建 Pipeline"></a>创建 Pipeline</h4><p>创建 Pipeline 任务<br><img src="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(9).8ad3nf06rz.webp" alt="image.png"><br><img src="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(10).7p3g145qhb.webp" alt="image.png"><br>在 Pipeline Syntax 中获得需要的 Groovy 语法，例如拉取 GitLab 代码的语法<br><img src="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(11).99t70l2xxs.webp" alt="image.png"><br>最终的 Pipeline 语法如下</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">pipeline &#123;</span><br><span class="line">    agent any</span><br><span class="line"></span><br><span class="line">    stages &#123;</span><br><span class="line">        </span><br><span class="line">        stage(<span class="string">&#x27;拉取代码&#x27;</span>) &#123;</span><br><span class="line">            steps &#123;</span><br><span class="line">                git <span class="attr">credentialsId:</span> <span class="string">&#x27;GitLab_ID&#x27;</span>, <span class="attr">url:</span> <span class="string">&#x27;http://198.19.249.15/root/ruoyi-test.git&#x27;</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        stage(<span class="string">&#x27;编译代码&#x27;</span>) &#123;</span><br><span class="line">            steps &#123;</span><br><span class="line">                sh <span class="string">&#x27;/var/apache-maven-3.9.4/bin/mvn clean compile package -s=/var/apache-maven-3.9.4/conf/settings.xml -T 8C -Dmaven.test.skip=true&#x27;</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        stage(<span class="string">&#x27;Docker镜像构建&#x27;</span>) &#123;</span><br><span class="line">            steps &#123;</span><br><span class="line">                sh <span class="string">&#x27;cd ruoyi-admin &amp;&amp; docker build -t ruoyi:latest .&#x27;</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        stage(<span class="string">&#x27;Docker镜像推送到Harbor&#x27;</span>) &#123;</span><br><span class="line">            steps &#123;</span><br><span class="line">                sh <span class="string">&#x27;docker tag ruoyi:latest 192.168.3.67:1010/dev/ruoyi:latest&#x27;</span></span><br><span class="line">                sh <span class="string">&#x27;docker push 192.168.3.67:1010/dev/ruoyi:latest&#x27;</span>   </span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中 **Docker镜像推送到Harbor **阶段执行的命令来自于 Harbor 中自建的 <strong>dev</strong> 仓库生成的命令，命令不能直接使用，需要将<code>my.harbor.com</code>替换成 IP<code>192.168.3.67</code><br><img src="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(12).8z6d7fnpsg.webp" alt="image.png"></p>
+<h4 id="测试流水线"><a href="#测试流水线" class="headerlink" title="测试流水线"></a>测试流水线</h4><p>为了让 Jenkins Pipeline 每个阶段日志输出更加清晰，建议到 Jenkins Plugin 中安装 <strong>Blue Ocean</strong> 插件<br><img src="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(13).7ax0a8xfm9.webp" alt="image.png"><br>构建成功后，在我们 Harbor 中即可看到 Jenkins 推送上去的镜像<br><img src="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(14).86thpp7429.webp" alt="image.png"></p>
+<h4 id="拉取镜像，运行容器"><a href="#拉取镜像，运行容器" class="headerlink" title="拉取镜像，运行容器"></a>拉取镜像，运行容器</h4><p>使用一台 Ubuntu 20.04 服务器，安装 Docker 服务，配置<code>/etc/docker/daemon.json</code></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;registry-mirrors&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="string">&quot;https://registry.docker-cn.com&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="string">&quot;http://hub-mirror.c.163.com&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="string">&quot;https://docker.mirrors.ustc.edu.cn&quot;</span></span><br><span class="line">  <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;insecure-registries&quot;</span><span class="punctuation">:</span><span class="punctuation">[</span><span class="string">&quot;192.168.3.67:1010&quot;</span><span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>重启 Docker 服务<code>service docker restart</code>，登录 Harbor <code>docker login 192.168.3.67:1010 -uadmin -pHarbor12345</code>，然后从 Harbor 中拉取镜像，运行容器<br><img src="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(15).wieenfj2q.webp" alt="image.png"><br>登录系统<br><img src="https://longjunzhang.github.io/picx-images-hosting/20240604/image-(16).7p3g145qhf.webp" alt="image.png"><br>运行成功！</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>经过上面一系列的 CI&#x2F;CD 组件的环境搭建与软件测试，一个能满足日常开发需求的 CI&#x2F;CD 环境已经搭建完成，已经初步达成了我们的一开始设定的目标。<br>但，这里面依然有一些需要持续优化的地方</p>
+<ol>
+<li>GitLab 代码合并后，Jenkins 并没有自动监听到指定分支的合并请求，自动执行 Pipeline 的构建</li>
+<li>Pipeline 中将 Docker 镜像推送到 Harbor 后，后续的服务运行环境依然需要手动拉取镜像手动启动容器，没有自动化</li>
+<li>Pipeline 并没有监听到服务在运行环境中，容器是否启动成功，容器内服务是否启动成功</li>
+<li>如果 Pipeline 是应用于生产环境，生产环境会弹性部署多个服务实例，目前无法支持</li>
+</ol>
+<p>总之，本篇文章构建的一套 CI&#x2F;CD 组件能用，但还不够好用，后续优化内容，将会有一篇新的文章来讲解：如何让开发者只需要关心 Git 操作，就能实现最终的服务自动化部署。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/blog/tags/Docker/" rel="tag"># Docker</a>
+              <a href="/blog/tags/CI-CD/" rel="tag"># CI/CD</a>
+              <a href="/blog/tags/Jenkins/" rel="tag"># Jenkins</a>
+              <a href="/blog/tags/SpringBoot/" rel="tag"># SpringBoot</a>
+              <a href="/blog/tags/Pipeline/" rel="tag"># Pipeline</a>
+              <a href="/blog/tags/Harbor/" rel="tag"># Harbor</a>
+              <a href="/blog/tags/1Panel/" rel="tag"># 1Panel</a>
+              <a href="/blog/tags/Nexus/" rel="tag"># Nexus</a>
+              <a href="/blog/tags/GitLab/" rel="tag"># GitLab</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/2024/05/31/CompletableFuture-%E5%B9%B6%E5%8F%91%E5%A4%B1%E6%95%88%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90/" rel="prev" title="CompletableFuture 并发失效问题分析">
+                  <i class="fa fa-angle-left"></i> CompletableFuture 并发失效问题分析
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Frank</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/blog/js/comments.js"></script><script src="/blog/js/utils.js"></script><script src="/blog/js/motion.js"></script><script src="/blog/js/schemes/muse.js"></script><script src="/blog/js/sidebar.js"></script><script src="/blog/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
