@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.2.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"longjunzhang.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","darkmode":false,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/blog/js/config.js"></script>
+
+    <meta name="description" content="总结使用 Java8 新的时间 API 好处与示例">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 8 日期时间 API 总结">
+<meta property="og:url" content="https://longjunzhang.github.io/blog/2024/06/05/Java-8-%E6%97%A5%E6%9C%9F%E6%97%B6%E9%97%B4-API-%E6%80%BB%E7%BB%93/index.html">
+<meta property="og:site_name" content="龙军的技术博客">
+<meta property="og:description" content="总结使用 Java8 新的时间 API 好处与示例">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240605/image.73tshl35ga.webp">
+<meta property="og:image" content="https://longjunzhang.github.io/picx-images-hosting/20240605/image-(1).8vmrchmic9.webp">
+<meta property="article:published_time" content="2024-06-05T15:14:27.000Z">
+<meta property="article:modified_time" content="2024-06-05T15:16:44.295Z">
+<meta property="article:author" content="Frank">
+<meta property="article:tag" content="Java8">
+<meta property="article:tag" content="LocalDateTime">
+<meta property="article:tag" content="DateTimeFormatter">
+<meta property="article:tag" content="Period">
+<meta property="article:tag" content="Duration">
+<meta property="article:tag" content="Instant">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://longjunzhang.github.io/picx-images-hosting/20240605/image.73tshl35ga.webp">
+
+
+<link rel="canonical" href="https://longjunzhang.github.io/blog/2024/06/05/Java-8-%E6%97%A5%E6%9C%9F%E6%97%B6%E9%97%B4-API-%E6%80%BB%E7%BB%93/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://longjunzhang.github.io/blog/2024/06/05/Java-8-%E6%97%A5%E6%9C%9F%E6%97%B6%E9%97%B4-API-%E6%80%BB%E7%BB%93/","path":"2024/06/05/Java-8-日期时间-API-总结/","title":"Java 8 日期时间 API 总结"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Java 8 日期时间 API 总结 | 龙军的技术博客</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">龙军的技术博客</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E4%BD%BF%E7%94%A8-Java8-%E6%97%A5%E6%9C%9F%E6%97%B6%E9%97%B4-API"><span class="nav-number">1.</span> <span class="nav-text">为什么要使用 Java8 日期时间 API ?</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Java-8-%E4%B9%8B%E5%89%8D%E6%97%A5%E6%9C%9F%E6%97%B6%E9%97%B4-API-%E7%9A%84%E7%BC%BA%E7%82%B9"><span class="nav-number">1.1.</span> <span class="nav-text">Java 8 之前日期时间 API 的缺点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java-8-%E5%BC%95%E5%85%A5%E7%9A%84%E6%97%B6%E9%97%B4-API-%E4%BC%98%E7%82%B9"><span class="nav-number">1.2.</span> <span class="nav-text">Java 8 引入的时间 API 优点</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E9%9C%80%E6%B1%82%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.</span> <span class="nav-text">常用需求实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Date-%E4%B8%8E-LocalDateTime-%E4%B9%8B%E9%97%B4%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2"><span class="nav-number">2.1.</span> <span class="nav-text">Date 与 LocalDateTime 之间相互转换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E6%97%A5%E6%9C%9F%E6%97%B6%E9%97%B4%E5%A4%9A%E7%A7%8D%E6%96%B9%E5%BC%8F"><span class="nav-number">2.2.</span> <span class="nav-text">创建日期时间多种方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%9A%84%E6%97%B6%E9%97%B4"><span class="nav-number">2.3.</span> <span class="nav-text">创建计算机的时间</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LocalTime-LocalDate-LocalDateTime-%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2"><span class="nav-number">2.4.</span> <span class="nav-text">LocalTime, LocalDate, LocalDateTime 相互转换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E6%97%B6%E9%97%B4%E9%97%B4%E9%9A%94"><span class="nav-number">2.5.</span> <span class="nav-text">计算时间间隔</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E6%97%A5%E6%9C%9F%E9%97%B4%E9%9A%94"><span class="nav-number">2.6.</span> <span class="nav-text">计算日期间隔</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C%E6%97%A5%E6%9C%9F%E6%97%B6%E9%97%B4"><span class="nav-number">2.7.</span> <span class="nav-text">操作日期时间</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%E8%A7%A3%E6%9E%90%E6%97%B6%E9%97%B4%E6%97%A5%E6%9C%9F"><span class="nav-number">2.8.</span> <span class="nav-text">字符串解析时间日期</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E7%89%B9%E6%AE%8A%E7%9A%84%E6%97%B6%E9%97%B4%E6%97%A5%E6%9C%9F"><span class="nav-number">2.9.</span> <span class="nav-text">计算特殊的时间日期</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Frank</p>
+  <div class="site-description" itemprop="description">人是一棵会思考芦苇</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/blog/archives/">
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://longjunzhang.github.io/blog/2024/06/05/Java-8-%E6%97%A5%E6%9C%9F%E6%97%B6%E9%97%B4-API-%E6%80%BB%E7%BB%93/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="Frank">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="龙军的技术博客">
+      <meta itemprop="description" content="人是一棵会思考芦苇">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Java 8 日期时间 API 总结 | 龙军的技术博客">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Java 8 日期时间 API 总结
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2024-06-05 23:14:27 / 修改时间：23:16:44" itemprop="dateCreated datePublished" datetime="2024-06-05T23:14:27+08:00">2024-06-05</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="为什么要使用-Java8-日期时间-API"><a href="#为什么要使用-Java8-日期时间-API" class="headerlink" title="为什么要使用 Java8 日期时间 API ?"></a>为什么要使用 Java8 日期时间 API ?</h1><h2 id="Java-8-之前日期时间-API-的缺点"><a href="#Java-8-之前日期时间-API-的缺点" class="headerlink" title="Java 8 之前日期时间 API 的缺点"></a>Java 8 之前日期时间 API 的缺点</h2><p>Java 8 之前的日期时间 API 有以下几个主要缺点</p>
+<ol>
+<li><p>我们只能使用<code>Date</code>类来表示时间, 如果试图从<code>Date</code>对象中获取日期, 结果就会变得晦涩难以理解</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Date</span> <span class="variable">date</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Date</span>();</span><br><span class="line">log.info(<span class="string">&quot;&#123;&#125;&quot;</span>, date.toString());	<span class="comment">//Mon Jun 03 15:03:56 GMT+08:00 2024</span></span><br><span class="line">log.info(<span class="string">&quot;&#123;&#125;&quot;</span>, date.getDate());		<span class="comment">//3(每个月的第几条)</span></span><br><span class="line">log.info(<span class="string">&quot;&#123;&#125;&quot;</span>, date.getTime());		<span class="comment">//1717398236493(返回从1970, 00:00:00 GMT至今的毫秒数)</span></span><br><span class="line">log.info(<span class="string">&quot;&#123;&#125;&quot;</span>, date.getYear());		<span class="comment">//124(从1900至今过去了多少年)</span></span><br><span class="line">log.info(<span class="string">&quot;&#123;&#125;&quot;</span>, date.getMonth());	<span class="comment">//5(0作为一月份, 5代表6月份)</span></span><br><span class="line">log.info(<span class="string">&quot;&#123;&#125;&quot;</span>, date.getDay());		<span class="comment">//1(0作为星期天, 1代表星期一)</span></span><br><span class="line">log.info(<span class="string">&quot;&#123;&#125;&quot;</span>, date.getHours());	<span class="comment">//15(返回24小时制的小时)</span></span><br><span class="line">log.info(<span class="string">&quot;&#123;&#125;&quot;</span>, date.getMinutes());	<span class="comment">//3(返回分钟数)</span></span><br><span class="line">log.info(<span class="string">&quot;&#123;&#125;&quot;</span>, date.getSeconds());	<span class="comment">//56(返回秒数)</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>同样的, 使用<code>Calendar</code>表示日期, 依然晦涩难懂, 因为 Calendar 对象也是从 0 开始计算月份的</p>
+</li>
+<li><p>解析日期时间的抽象类<code>DateFormat</code>不是线程安全的（其常用子类<code>SimpleDateFormat</code>是可变对象，多线程同时访问会造成数据互相干扰）</p>
+</li>
+</ol>
+<h2 id="Java-8-引入的时间-API-优点"><a href="#Java-8-引入的时间-API-优点" class="headerlink" title="Java 8 引入的时间 API 优点"></a>Java 8 引入的时间 API 优点</h2><ol>
+<li><code>LocalTime, LocalDate, LocalDateTime, Instant, Duration, Period</code>这些新日期时间类设计合理, 很容易区分每个类是处理时间的哪个部分 (例如: LocalTime 表示时间，LocalDate 表示日期, LocalDateTime表示日期和时间, Duration表示时间间隔)</li>
+<li>对时间区分了 2 中建模，一种是面对人类的可读性很高的建模（如：<code>LocalDateTime</code>）；另一种是面对计算机的执行效率更高的建模（如：<code>Instant</code>)</li>
+<li>对时间日期的间隔设计了建模，<code>Duration, Period</code>，方便开发者计算时间间隔</li>
+<li>提供了高级的时间日期间隔模型，<code>TemporalAdjuster</code>方便计算实际业务中的时间间隔</li>
+<li>提供了并发安全的时间字符串解析器<code>DateTimeFormatter</code></li>
+</ol>
+<h1 id="常用需求实现"><a href="#常用需求实现" class="headerlink" title="常用需求实现"></a>常用需求实现</h1><h2 id="Date-与-LocalDateTime-之间相互转换"><a href="#Date-与-LocalDateTime-之间相互转换" class="headerlink" title="Date 与 LocalDateTime 之间相互转换"></a>Date 与 LocalDateTime 之间相互转换</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Date -&gt; LocalDateTime</span></span><br><span class="line"><span class="type">Date</span> <span class="variable">date</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Date</span>();</span><br><span class="line"><span class="type">ZoneId</span> <span class="variable">zoneId</span> <span class="operator">=</span> ZoneId.systemDefault();</span><br><span class="line"><span class="type">LocalDateTime</span> <span class="variable">localDateTime</span> <span class="operator">=</span> LocalDateTime.ofInstant(date.toInstant(), zoneId);</span><br><span class="line"></span><br><span class="line"><span class="comment">// LocalDateTime -&gt; Date</span></span><br><span class="line"><span class="type">Instant</span> <span class="variable">instant</span> <span class="operator">=</span> localDateTime.atZone(ZoneId.systemDefault()).toInstant();</span><br><span class="line"><span class="type">Date</span> <span class="variable">dateObj</span> <span class="operator">=</span> Date.from(instant);</span><br></pre></td></tr></table></figure>
+<h2 id="创建日期时间多种方式"><a href="#创建日期时间多种方式" class="headerlink" title="创建日期时间多种方式"></a>创建日期时间多种方式</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建日期</span></span><br><span class="line"><span class="type">LocalDate</span> <span class="variable">now</span> <span class="operator">=</span> LocalDate.now();</span><br><span class="line"><span class="type">LocalDate</span> <span class="variable">localDate</span> <span class="operator">=</span> LocalDate.of(<span class="number">2021</span>, Month.APRIL, <span class="number">1</span>);</span><br><span class="line"><span class="type">LocalDate</span> <span class="variable">localDate1</span> <span class="operator">=</span> LocalDate.of(<span class="number">2021</span>, <span class="number">4</span>, <span class="number">1</span>);</span><br><span class="line"><span class="comment">// 获取年月日详见JDK API</span></span><br><span class="line"><span class="type">int</span> <span class="variable">year</span> <span class="operator">=</span> now.getYear();</span><br><span class="line"><span class="type">Month</span> <span class="variable">month</span> <span class="operator">=</span> now.getMonth();</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建时间</span></span><br><span class="line"><span class="type">LocalTime</span> <span class="variable">now2</span> <span class="operator">=</span> LocalTime.now();</span><br><span class="line"><span class="type">LocalTime</span> <span class="variable">localTime</span> <span class="operator">=</span> LocalTime.of(<span class="number">11</span>, <span class="number">12</span>, <span class="number">13</span>);</span><br><span class="line"><span class="comment">// 获取时分秒毫秒纳秒详见JDK API</span></span><br><span class="line"><span class="type">int</span> <span class="variable">hour</span> <span class="operator">=</span> now2.getHour();</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建日期+时间</span></span><br><span class="line"><span class="type">LocalDateTime</span> <span class="variable">now1</span> <span class="operator">=</span> LocalDateTime.now();</span><br><span class="line"><span class="type">LocalDateTime</span> <span class="variable">localDateTime</span> <span class="operator">=</span> LocalDateTime.of(<span class="number">2021</span>, Month.APRIL, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line"><span class="type">LocalDateTime</span> <span class="variable">localDateTime1</span> <span class="operator">=</span> LocalDateTime.of(<span class="number">2021</span>, <span class="number">4</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 通用的获取日期时间数值的方法</span></span><br><span class="line"><span class="type">int</span> <span class="variable">hour</span> <span class="operator">=</span> localTime.get(ChronoField.HOUR_OF_DAY);</span><br><span class="line"><span class="type">int</span> <span class="variable">year</span> <span class="operator">=</span> localDate.get(ChronoField.YEAR);</span><br><span class="line"><span class="type">int</span> <span class="variable">month</span> <span class="operator">=</span> localDateTime.get(ChronoField.MONTH_OF_YEAR);</span><br></pre></td></tr></table></figure>
+<h2 id="创建计算机的时间"><a href="#创建计算机的时间" class="headerlink" title="创建计算机的时间"></a>创建计算机的时间</h2><p>对于计算机而言, 对时间最好的建模就是从某个时间点开始, 一直往后计算秒数. 这种方式对计算机最合理, 但对人而言可读性很差. 有些场景, 我们需要获取计算机的时间, 此时就需要使用到<code>Instant</code>对象。<br><code>Instant</code>对象是基于 Unix 元年（UTC 时区 1970 年 1 月 1 日午夜时分）开始。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Instant</span> <span class="variable">now</span> <span class="operator">=</span> Instant.now();</span><br><span class="line"><span class="type">long</span> <span class="variable">secondVal</span> <span class="operator">=</span> now.getLong(ChronoField.INSTANT_SECONDS); <span class="comment">// 1717598839</span></span><br><span class="line">now.plusXxx();	<span class="comment">// 计算时间相加</span></span><br><span class="line">now.minusXxx();	<span class="comment">// 计算时间相减</span></span><br><span class="line">now.with(ChronoField.INSTANT_SECONDS, <span class="number">5</span>)	<span class="comment">//调整时间值</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 重载方法，传入纳秒实现精准调控时间</span></span><br><span class="line">Instant.ofEpochSecond(<span class="number">5</span>);</span><br><span class="line">Instant.ofEpochSecond(<span class="number">5</span>, <span class="number">0</span>);</span><br><span class="line">Instant.ofEpochSecond(<span class="number">4</span>, <span class="number">1_000_000_000</span>);</span><br><span class="line">Instant.ofEpochSecond(<span class="number">6</span>, -<span class="number">1_000_000_000</span>);</span><br></pre></td></tr></table></figure>
+<h2 id="LocalTime-LocalDate-LocalDateTime-相互转换"><a href="#LocalTime-LocalDate-LocalDateTime-相互转换" class="headerlink" title="LocalTime, LocalDate, LocalDateTime 相互转换"></a>LocalTime, LocalDate, LocalDateTime 相互转换</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// LocalTime -&gt; LocalDateTime</span></span><br><span class="line"><span class="type">LocalDateTime</span> <span class="variable">localDateTime2</span> <span class="operator">=</span> localTime.atDate(LocalDate.now());</span><br><span class="line"><span class="comment">// LocalDate -&gt; LocalDateTime</span></span><br><span class="line"><span class="type">LocalDateTime</span> <span class="variable">localDateTime3</span> <span class="operator">=</span> localDate.atTime(LocalTime.now());</span><br><span class="line"><span class="comment">// LocalDateTime -&gt; LocalTime</span></span><br><span class="line"><span class="type">LocalTime</span> <span class="variable">localTime1</span> <span class="operator">=</span> localDateTime.toLocalTime();</span><br><span class="line"><span class="comment">// LocalDateTime -&gt; LocalDate</span></span><br><span class="line"><span class="type">LocalDate</span> <span class="variable">localDate2</span> <span class="operator">=</span> localDateTime.toLocalDate();</span><br></pre></td></tr></table></figure>
+<h2 id="计算时间间隔"><a href="#计算时间间隔" class="headerlink" title="计算时间间隔"></a>计算时间间隔</h2><p><code>Duration</code>类中的静态方法<code>between</code>用于判断时间的间隔, 只能比较<code>LocalTime, LocalDateTime, Instant</code>对象, 因为该方法返回的是两者相差的秒或毫秒数, 而<code>LocalTime, LocalDateTime, Instant</code>恰恰是基于秒和毫秒为基础构建的时间. (<code>LocalDate</code>不含有秒值, 故而不能使用 Duration 计算差值)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Duration</span> <span class="variable">between</span> <span class="operator">=</span> Duration.between(localDateTime, localDateTime1);</span><br><span class="line"><span class="comment">// 只能获取 Second 和 NanoSecond</span></span><br><span class="line">List&lt;TemporalUnit&gt; units = between.getUnits(); <span class="comment">//[Seconds, Nanos]</span></span><br><span class="line"><span class="type">long</span> <span class="variable">seconds</span> <span class="operator">=</span> between.getSeconds();</span><br><span class="line"><span class="type">int</span> <span class="variable">nano</span> <span class="operator">=</span> between.getNano();</span><br><span class="line"></span><br><span class="line"><span class="comment">// 将秒的时间转为可读性强的LocalTime</span></span><br><span class="line"><span class="type">Duration</span> <span class="variable">between</span> <span class="operator">=</span> Duration.between(</span><br><span class="line">        LocalTime.of(<span class="number">11</span>, <span class="number">12</span>, <span class="number">13</span>),</span><br><span class="line">        LocalTime.of(<span class="number">13</span>, <span class="number">12</span>, <span class="number">13</span>)</span><br><span class="line">);</span><br><span class="line">System.out.println(LocalTime.ofSecondOfDay(between.getSeconds()));</span><br></pre></td></tr></table></figure>
+<p><code>Duration</code>类中还提供了很多静态方法, 用于操控时间间隔, 具体不在详列, 建议有需要就去查看 API 函数定义, 都很易上手.</p>
+<h2 id="计算日期间隔"><a href="#计算日期间隔" class="headerlink" title="计算日期间隔"></a>计算日期间隔</h2><p><code>Period</code>类中的静态方法<code>between</code>用于判断日期的间隔</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Period</span> <span class="variable">between1</span> <span class="operator">=</span> Period.between(</span><br><span class="line">        LocalDate.of(<span class="number">2021</span>, <span class="number">4</span>, <span class="number">1</span>),</span><br><span class="line">        LocalDate.of(<span class="number">2021</span>, <span class="number">5</span>, <span class="number">1</span>)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">List&lt;TemporalUnit&gt; units1 = between1.getUnits();</span><br><span class="line">System.out.println(between1.getYears());</span><br><span class="line">System.out.println(between1.getMonths());</span><br><span class="line">System.out.println(between1.getDays());</span><br></pre></td></tr></table></figure>
+<p><code>Duration</code>和<code>Period</code>有很多共通的方法，参见下表<br><img src="https://longjunzhang.github.io/picx-images-hosting/20240605/image.73tshl35ga.webp" alt="image.png"></p>
+<h2 id="操作日期时间"><a href="#操作日期时间" class="headerlink" title="操作日期时间"></a>操作日期时间</h2><p>Java 8 提供了大量的操作时间的 API, 可以分为以下几类</p>
+<ol>
+<li><code>.plusXxx()</code>对当前日期时间<strong>加上</strong>年份, 月份, 小时.., 返回一个新的对象</li>
+<li><code>.minusXxx()</code>对当前时间<strong>减去</strong>年份, 月份, 小时.., 返回一个新的对象</li>
+<li><code>.withXxx()</code>对当前时间年份, 月份, 小时…<strong>修改</strong>, 返回一个新的对象<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 2021-04-01</span></span><br><span class="line"><span class="type">LocalDate</span> <span class="variable">localDate</span> <span class="operator">=</span> LocalDate.of(<span class="number">2021</span>, <span class="number">4</span>, <span class="number">1</span>);</span><br><span class="line"><span class="comment">// 2021-04-02</span></span><br><span class="line"><span class="type">LocalDate</span> <span class="variable">plusDays</span> <span class="operator">=</span> localDate.plusDays(<span class="number">1</span>);</span><br><span class="line"><span class="comment">// 2021-03-29</span></span><br><span class="line"><span class="type">LocalDate</span> <span class="variable">minusDays</span> <span class="operator">=</span> localDate.minusDays(<span class="number">3</span>);</span><br><span class="line"><span class="comment">// 2021-01-10</span></span><br><span class="line"><span class="type">LocalDate</span> <span class="variable">dayOfYear</span> <span class="operator">=</span> localDate.withDayOfYear(<span class="number">10</span>);</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="字符串解析时间日期"><a href="#字符串解析时间日期" class="headerlink" title="字符串解析时间日期"></a>字符串解析时间日期</h2><p>由于<code>DateTimeFormatter</code>的实例<code>ISO_DATE, ISO_LOCAL_TIME, ...</code>都是<code>static final</code>修饰的, 且通过静态代码块初始化了对象, 所以都是线程安全的.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">LocalTime</span> <span class="variable">localTime</span> <span class="operator">=</span> LocalTime.parse(<span class="string">&quot;11:12:13&quot;</span>, DateTimeFormatter.ISO_LOCAL_TIME);</span><br><span class="line"><span class="type">LocalDate</span> <span class="variable">localDate</span> <span class="operator">=</span> LocalDate.parse(<span class="string">&quot;2021-04-01&quot;</span>, DateTimeFormatter.ISO_LOCAL_DATE);</span><br><span class="line"><span class="type">LocalDateTime</span> <span class="variable">localDateTime</span> <span class="operator">=</span> LocalDateTime.parse(<span class="string">&quot;2021-04-01T11:12:13&quot;</span>, DateTimeFormatter.ISO_LOCAL_DATE_TIME);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 自定义日期时间格式化对象</span></span><br><span class="line"><span class="type">DateTimeFormatter</span> <span class="variable">myFormatter</span> <span class="operator">=</span> DateTimeFormatter.ofPattern(<span class="string">&quot;日期:yyyy-MM-dd, 时间:HH:mm:ss&quot;</span>, Locale.SIMPLIFIED_CHINESE);</span><br><span class="line"><span class="comment">// 日期:2024-06-03, 时间:18:18:35</span></span><br><span class="line"><span class="type">String</span> <span class="variable">myDateTime</span> <span class="operator">=</span> LocalDateTime.now().format(myFormatter);</span><br></pre></td></tr></table></figure>
+<h2 id="计算特殊的时间日期"><a href="#计算特殊的时间日期" class="headerlink" title="计算特殊的时间日期"></a>计算特殊的时间日期</h2><p>有些需求, 需要我们根据当前时间, 计算出这个月的最后一天的日期, 这样的需求就需要用到<code>TemporalAdjusters</code>中提供的各种静态方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 2021-04-01T11:12:13</span></span><br><span class="line"><span class="type">LocalDateTime</span> <span class="variable">now</span> <span class="operator">=</span> LocalDateTime.now();</span><br><span class="line"><span class="comment">// 2021-04-05T11:12:13(下周一)</span></span><br><span class="line"><span class="type">LocalDateTime</span> <span class="variable">nextMonday</span> <span class="operator">=</span> now.with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY));</span><br><span class="line"><span class="comment">// 2022-01-01T11:12:13(下一年的第一天)</span></span><br><span class="line"><span class="type">LocalDateTime</span> <span class="variable">firstDayOfNextYear</span> <span class="operator">=</span> now.with(TemporalAdjusters.firstDayOfNextYear());</span><br></pre></td></tr></table></figure>
+<p>具体更多用法, 参见<code>TemporalAdjusters</code>类中描述, 下面给出一张出自&lt;<Java8 In Action>&gt;书中的列表图<br><img src="https://longjunzhang.github.io/picx-images-hosting/20240605/image-(1).8vmrchmic9.webp" alt="image.png"></p>
+<blockquote>
+<p>Reference From《Java 8 In Action》#Chapter 12</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/blog/tags/Java8/" rel="tag"># Java8</a>
+              <a href="/blog/tags/LocalDateTime/" rel="tag"># LocalDateTime</a>
+              <a href="/blog/tags/DateTimeFormatter/" rel="tag"># DateTimeFormatter</a>
+              <a href="/blog/tags/Period/" rel="tag"># Period</a>
+              <a href="/blog/tags/Duration/" rel="tag"># Duration</a>
+              <a href="/blog/tags/Instant/" rel="tag"># Instant</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/2024/06/04/%E5%9F%BA%E4%BA%8E-Docker-%E5%AE%B9%E5%99%A8%E9%83%A8%E7%BD%B2-CI-CD-%E7%8E%AF%E5%A2%83-%E4%B8%80/" rel="prev" title="基于 Docker 容器部署 CI/CD 环境(一)">
+                  <i class="fa fa-angle-left"></i> 基于 Docker 容器部署 CI/CD 环境(一)
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Frank</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/blog/js/comments.js"></script><script src="/blog/js/utils.js"></script><script src="/blog/js/motion.js"></script><script src="/blog/js/schemes/muse.js"></script><script src="/blog/js/sidebar.js"></script><script src="/blog/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
